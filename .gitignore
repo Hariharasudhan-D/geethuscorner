@@ -1,0 +1,11 @@
+# Secrets - never upload these to GitHub
+.env
+.env.local
+application-local.properties
+
+# Editor and operating-system files
+.vscode/
+.idea/
+*.iml
+Thumbs.db
+.DS_Store
