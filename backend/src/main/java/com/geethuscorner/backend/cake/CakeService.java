@@ -1,5 +1,6 @@
 package com.geethuscorner.backend.cake;
 
+import com.geethuscorner.backend.NotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +25,7 @@ public class CakeService {
     // Find one cake, or throw error if not found
     public Cake getCakeById(Long id) {
         return cakeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cake not found with id " + id));
+                .orElseThrow(() -> new NotFoundException("Cake not found with id " + id));
     }
 
     // Add a new cake (now takes CakeRequest, not Cake) 🆕
