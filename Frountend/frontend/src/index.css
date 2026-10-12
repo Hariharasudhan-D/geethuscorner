@@ -1,0 +1,23 @@
+/* Fonts: Playfair Display for headings, Poppins for text */
+@import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@400;500;600&display=swap");
+
+/* Colours we reuse everywhere */
+:root {
+  --brown: #4a2c1f;
+  --pink: #e8638c;
+  --cream: #fff8f1;
+  --soft-text: #8a6a5c;
+}
+
+/* Remove default browser spacing */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background: var(--cream);
+  color: var(--brown);
+}
