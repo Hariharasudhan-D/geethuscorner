@@ -372,3 +372,7 @@ section {
 .status-message.error {
   color: #c0392b;
 }
+/* Sold-out cakes look faded */
+.cake-card.sold {
+  opacity: 0.6;
+}
