@@ -9,7 +9,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class CorsConfig implements WebMvcConfigurer {
 
     // Our frontend address. Locally 5173, later our live Vercel URL.
-    @Value("${FRONTEND_URL:http://localhost:5173}")
+    @Value("${FRONTEND_URL:https://geethuscorner.vercel.app}")
     private String frontendUrl;
 
     @Override

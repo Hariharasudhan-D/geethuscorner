@@ -11,10 +11,10 @@ import java.util.List;
 public class CakeService {
 
     private final CakeRepository cakeRepository;
-
-    // Customers: only in-stock cakes
-    public List<Cake> getAvailableCakes() {
-        return cakeRepository.findByAvailableTrue();
+    
+ // Customers: all cakes (sold-out ones shown at the bottom)
+    public List<Cake> getMenuCakes() {
+        return cakeRepository.findAllByOrderByAvailableDescNameAsc();
     }
 
     // Admin: all cakes

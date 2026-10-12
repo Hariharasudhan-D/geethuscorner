@@ -16,9 +16,9 @@ public class CakeController {
     private final CakeService cakeService;
 
     // GET /api/cakes → in-stock cakes
-    @GetMapping
-    public List<Cake> getAvailableCakes() {
-        return cakeService.getAvailableCakes();
+      @GetMapping
+    public List<Cake> getMenuCakes() {
+        return cakeService.getMenuCakes();
     }
 
     // GET /api/cakes/all → all cakes

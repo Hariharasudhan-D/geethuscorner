@@ -6,6 +6,6 @@ import java.util.List;
 
 public interface CakeRepository extends JpaRepository<Cake, Long> {
 
-    List<Cake> findByAvailableTrue();
+    List<Cake> findAllByOrderByAvailableDescNameAsc();
     List<Cake> findByCategory(String category);
 }
