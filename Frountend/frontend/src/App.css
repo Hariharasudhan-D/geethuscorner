@@ -560,3 +560,39 @@ section {
   color: var(--pink);
   font-weight: 600;
 }
+/* ---------- Navbar: logged-in user ---------- */
+.nav-user {
+  font-weight: 600;
+  color: var(--pink);
+}
+
+.nav-logout {
+  background: none;
+  border: 2px solid var(--brown);
+  color: var(--brown);
+  padding: 6px 16px;
+  border-radius: 30px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.nav-logout:hover {
+  background: var(--brown);
+  color: white;
+}
+
+.nav-links {
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+/* Success message */
+.form-success {
+  background: #e8f6ee;
+  color: #1d6b3a;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}

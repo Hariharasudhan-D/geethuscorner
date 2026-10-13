@@ -45,3 +45,10 @@ export function signup(form) {
     body: JSON.stringify(form),
   });
 }
+// Change my own password (needs the wristband, added automatically)
+export function changePassword(oldPassword, newPassword) {
+  return request("/api/auth/change-password", {
+    method: "PUT",
+    body: JSON.stringify({ oldPassword, newPassword }),
+  });
+}
