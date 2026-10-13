@@ -68,10 +68,10 @@ public class SecurityConfig {
     // CORS: which website may call our API (moved here from CorsConfig.java)
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl) {
+            @Value("${FRONTEND_URL:https://geethuscorner.vercel.app,http://localhost:5173}") String frontendUrls) {
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrl));                       // only OUR website
+        config.setAllowedOrigins(List.of(frontendUrls.split(",")));          // only OUR websites (live + laptop)
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));   // allow the wristband header
 
