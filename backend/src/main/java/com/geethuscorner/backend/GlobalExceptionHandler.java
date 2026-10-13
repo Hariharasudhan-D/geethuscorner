@@ -1,4 +1,6 @@
 package com.geethuscorner.backend;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -38,5 +40,13 @@ public class GlobalExceptionHandler {
                 "errors", errors
         );
         return ResponseEntity.badRequest().body(body);
+    }
+    // ---------- Problem 3: a business rule we broke on purpose (e.g. email already used) ----------
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<Map<String, Object>> handleStatus(ResponseStatusException ex) {
+        Map<String, Object> body = new HashMap<>();
+        body.put("status", ex.getStatusCode().value());   // e.g. 409
+        body.put("message", ex.getReason());              // e.g. "This email is already registered"
+        return ResponseEntity.status(ex.getStatusCode()).body(body);
     }
 }
