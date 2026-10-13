@@ -423,3 +423,140 @@ section {
   color: var(--pink);
   font-weight: 600;
 }
+/* ---------- Login / Signup pages ---------- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  padding: 40px 32px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(74, 44, 31, 0.08);
+  display: flex;
+  flex-direction: column;
+}
+
+.auth-card h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+}
+
+.auth-subtitle {
+  color: var(--soft-text);
+  margin: 6px 0 20px;
+}
+
+.auth-card label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin: 16px 0 6px;
+}
+
+.auth-card input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1.5px solid #e6d6cc;
+  border-radius: 12px;
+  background: #fffdfb;
+  color: var(--brown);
+  font-family: inherit;
+  font-size: 1rem;
+}
+
+.auth-card input:focus {
+  outline: none;
+  border-color: var(--pink);   /* pink border while typing */
+}
+
+/* Password box with Show/Hide, and phone box with +91 */
+.password-box,
+.phone-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-box input,
+.phone-box input {
+  flex: 1;
+  min-width: 0;
+}
+
+.show-button {
+  background: none;
+  border: none;
+  padding: 10px;
+  color: var(--pink);
+  font-family: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.phone-box span {
+  padding: 12px 14px;
+  background: #fbefe7;
+  border-radius: 12px;
+  font-weight: 500;
+}
+
+/* Messages */
+.form-error {
+  background: #fdecee;
+  color: #a3242f;
+  padding: 12px 14px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.field-error {
+  color: #c0392b;
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.field-hint {
+  color: var(--soft-text);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+/* Main button */
+.auth-button {
+  margin-top: 26px;
+  padding: 14px;
+  border: none;
+  border-radius: 14px;
+  background: var(--brown);
+  color: white;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.auth-button:hover {
+  background: var(--pink);
+}
+
+.auth-button:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.auth-switch {
+  text-align: center;
+  color: var(--soft-text);
+  font-size: 0.9rem;
+  margin-top: 20px;
+}
+
+.auth-switch a {
+  color: var(--pink);
+  font-weight: 600;
+}
