@@ -1,14 +1,16 @@
-// Top bar: shop name on the left, links on the right
+import { Link } from "react-router";
+
 function Navbar() {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <a href="#home" className="logo">Geethu's Corner 🍰</a>
+        <Link to="/" className="logo">Geethu's Corner 🍰</Link>
 
         <div className="nav-links">
-          <a href="#home">Home</a>
-          <a href="#menu">Menu</a>
-          <a href="#contact">Contact</a>
+          <Link to="/">Home</Link>
+          <a href="/#menu">Menu</a>                   {/* go to Home, then jump to the menu */}
+          <a href="#contact">Contact</a>              {/* footer is on every page */}
+          <Link to="/login" className="nav-button">Login</Link>
         </div>
       </div>
     </nav>

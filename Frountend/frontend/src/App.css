@@ -376,3 +376,50 @@ section {
 .cake-card.sold {
   opacity: 0.6;
 }
+/* ---------- Login button in the navbar ---------- */
+.nav-links .nav-button {
+  background: var(--brown);
+  color: white;
+  padding: 8px 20px;
+  border-radius: 30px;
+}
+
+.nav-links .nav-button::after {
+  display: none;   /* no pink underline on the button */
+}
+
+.nav-links .nav-button:hover {
+  background: var(--pink);
+}
+
+/* ---------- Login / Signup pages ---------- */
+.auth-page {
+  display: flex;
+  justify-content: center;
+  padding: 60px 0;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  background: white;
+  padding: 40px 32px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px rgba(74, 44, 31, 0.08);
+}
+
+.auth-card h1 {
+  font-family: "Playfair Display", serif;
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.auth-card p {
+  color: var(--soft-text);
+  margin-top: 12px;
+}
+
+.auth-card a {
+  color: var(--pink);
+  font-weight: 600;
+}
