@@ -63,4 +63,30 @@ public class AuthService {
                 "role", user.getRole().name()
         );
     }
+    // WHO AM I: return the logged-in user's basic info
+    public Map<String, String> me(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        return Map.of(
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "role", user.getRole().name()
+        );
+    }
+
+    // CHANGE PASSWORD: check the old one, then save the new fingerprint
+    public void changePassword(String email, ChangePasswordRequest request) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
+
+        // 1. Is the old password correct? 🔍
+        if (!passwordEncoder.matches(request.oldPassword(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Old password is wrong");
+        }
+
+        // 2. Save the NEW fingerprint 🔒
+        user.setPassword(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+    }
 }

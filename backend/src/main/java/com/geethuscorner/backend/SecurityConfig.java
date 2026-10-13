@@ -1,27 +1,82 @@
 package com.geethuscorner.backend;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-@Configuration   // Spring reads this class when the app starts
+import java.util.List;
+
+@Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    // The fingerprint machine 🔒 (we use it in signup and login)
+    private final JwtService jwtService;   // the guard needs this to read wristbands
+
+    // The fingerprint machine 🔒 (used in signup and login)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // The guard's rules. For NOW: let everyone in. We lock doors in Step 5.
+    // The RULE BOOK 📋
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())                           // not needed for JWT (see below)
-                .authorizeHttpRequests(auth -> auth.anyRequest().permitAll());  // all doors open (temporary)
+                .csrf(csrf -> csrf.disable())                  // not needed: we use JWT, not cookies
+                .cors(Customizer.withDefaults())               // use the CORS rules below
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // no memory, wristband every time
+                .exceptionHandling(e -> e.authenticationEntryPoint(
+                        new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))   // not logged in → 401
+
+                .authorizeHttpRequests(auth -> auth
+                        // 🟢 Open to everyone
+                        .requestMatchers("/api/health", "/api/auth/signup", "/api/auth/login", "/error").permitAll()
+
+                        // 🔴 Admin only: the full cake list (incl. hidden data later)
+                        .requestMatchers(HttpMethod.GET, "/api/cakes/all").hasRole("ADMIN")
+
+                        // 🟢 Everyone can SEE the menu and one cake
+                        .requestMatchers(HttpMethod.GET, "/api/cakes", "/api/cakes/*").permitAll()
+
+                        // 🔴 Admin only: add, edit, delete cakes (POST, PUT, DELETE)
+                        .requestMatchers("/api/cakes/**").hasRole("ADMIN")
+
+                        // 🟡 Everything else: must be logged in (orders, profile... later)
+                        .anyRequest().authenticated()
+                )
+
+                // Put our guard BEFORE Spring's own login filter
+                .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
+
         return http.build();
+    }
+
+    // CORS: which website may call our API (moved here from CorsConfig.java)
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource(
+            @Value("${FRONTEND_URL:http://localhost:5173}") String frontendUrl) {
+
+        CorsConfiguration config = new CorsConfiguration();
+        config.setAllowedOrigins(List.of(frontendUrl));                       // only OUR website
+        config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
+        config.setAllowedHeaders(List.of("Authorization", "Content-Type"));   // allow the wristband header
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/**", config);
+        return source;
     }
 }
