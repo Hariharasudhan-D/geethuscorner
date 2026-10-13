@@ -5,13 +5,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import com.geethuscorner.backend.JwtService;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;   // the BCrypt machine from SecurityConfig 🔒
+    private final JwtService jwtService;
+    private final PasswordEncoder passwordEncoder;// the BCrypt machine from SecurityConfig 🔒
+
 
     public void signup(SignupRequest request) {
 
@@ -33,5 +37,30 @@ public class AuthService {
 
         // 4. Write it in the members book
         userRepository.save(user);
+    }
+    // LOGIN: check email + password, then give a wristband
+    public Map<String, String> login(LoginRequest request) {
+
+        String email = request.email().trim().toLowerCase();
+
+        // 1. Find the member
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong email or password"));
+
+        // 2. Check the password: make a new fingerprint and compare 🔍
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong email or password");
+        }
+
+        // 3. Make the wristband 🎟️
+        String token = jwtService.createToken(user.getEmail(), user.getRole().name());
+
+        // 4. Send back the wristband + basic info for the frontend
+        return Map.of(
+                "token", token,
+                "name", user.getName(),
+                "email", user.getEmail(),
+                "role", user.getRole().name()
+        );
     }
 }

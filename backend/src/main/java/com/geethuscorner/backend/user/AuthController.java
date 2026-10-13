@@ -21,4 +21,8 @@ public class AuthController {
         authService.signup(request);
         return Map.of("message", "Account created successfully");
     }
+    @PostMapping("/login")
+    public Map<String, String> login(@Valid @RequestBody LoginRequest request) {
+        return authService.login(request);
+    }
 }
