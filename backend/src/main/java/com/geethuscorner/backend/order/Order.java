@@ -46,6 +46,10 @@ public class Order {
     private LocalDate deliveryDate;  // the day they want the cake
 
     @Enumerated(EnumType.STRING)
+    @Column(length = 20)          // no nullable=false: old orders have no slot
+    private TimeSlot timeSlot;
+
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private PaymentMethod paymentMethod;
 

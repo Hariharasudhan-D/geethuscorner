@@ -10,6 +10,7 @@ import Admin from "./Admin";
 import Cart from "./Cart";                       // 🆕
 import Checkout from "./Checkout";
 import MyOrders from "./MyOrders";
+import CustomCake from "./CustomCake";
 import { getMe } from "./api";
 import "./App.css";
 
@@ -111,7 +112,7 @@ function App() {
 
       <main className="container">
         <Routes>
-          <Route path="/" element={<Home onAddToCart={addToCart} />} />      {/* 🆕 */}
+          <Route path="/" element={<Home onAddToCart={addToCart} user={user} />} />      {/* 🆕 */}
           <Route path="/login" element={<Login onLogin={handleLogin} />} />
           <Route path="/signup" element={<Signup onLogin={handleLogin} />} />
           <Route
@@ -149,6 +150,10 @@ function App() {
               user ? <MyOrders />
                    : <Navigate to="/login" state={{ from: "/my-orders" }} />
             }
+          />
+          <Route
+            path="/custom-cake"
+            element={user ? <CustomCake /> : <Navigate to="/login" state={{ from: "/custom-cake" }} />}
           />
           <Route path="*" element={<p className="status-message">Page not found 🍰</p>} />
         </Routes>

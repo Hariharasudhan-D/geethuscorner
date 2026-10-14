@@ -1,6 +1,7 @@
 package com.geethuscorner.backend.order;
 
 import com.geethuscorner.backend.NotFoundException;
+import com.geethuscorner.backend.booking.BookingService;
 import com.geethuscorner.backend.cake.Cake;
 import com.geethuscorner.backend.cake.CakeRepository;
 import com.geethuscorner.backend.user.User;
@@ -21,6 +22,7 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final CakeRepository cakeRepository;
+    private final BookingService bookingService;   // the calendar keeper
 
     // PLACE AN ORDER
     @Transactional   // all or nothing: the order and ALL its items are saved together, or none
@@ -36,6 +38,9 @@ public class OrderService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Address is required for delivery");
         }
 
+        // Is this date open, not full, not too far away?
+        bookingService.checkDate(request.deliveryDate());
+
         // 3. Fill in the slip
         Order order = new Order();
         order.setUser(user);
@@ -43,6 +48,7 @@ public class OrderService {
         order.setAddress(isDelivery ? request.address().trim() : null);
         order.setPhone(user.getPhone());
         order.setDeliveryDate(request.deliveryDate());
+        order.setTimeSlot(request.timeSlot());
         order.setPaymentMethod(request.paymentMethod());
         order.setNote(request.note() == null ? null : request.note().trim());
 
@@ -84,5 +90,49 @@ public class OrderService {
         return orderRepository.findByUserEmailOrderByCreatedAtDesc(email).stream()
                 .map(OrderResponse::from)
                 .toList();
+    }
+
+    // ADMIN: all orders, newest first
+    @Transactional(readOnly = true)
+    public List<OrderResponse> getAllOrders() {
+        return orderRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(OrderResponse::from)
+                .toList();
+    }
+
+    // ADMIN: move an order to a new status
+    @Transactional
+    public OrderResponse updateStatus(Long id, OrderStatus newStatus) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order not found with id " + id));
+
+        // Delivered or cancelled = finished. They can't change any more.
+        if (order.getStatus() == OrderStatus.DELIVERED || order.getStatus() == OrderStatus.CANCELLED) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Order #" + id + " is already " + order.getStatus().name().toLowerCase());
+        }
+
+        order.setStatus(newStatus);
+        return OrderResponse.from(orderRepository.save(order));
+    }
+
+    // CUSTOMER: cancel my own order, only while it is still PENDING
+    @Transactional
+    public OrderResponse cancelMyOrder(String email, Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("Order not found with id " + id));
+
+        // Someone else's order? Act as if it doesn't exist.
+        if (!order.getUser().getEmail().equals(email)) {
+            throw new NotFoundException("Order not found with id " + id);
+        }
+
+        if (order.getStatus() != OrderStatus.PENDING) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "This order is already confirmed. Please call us to cancel it.");
+        }
+
+        order.setStatus(OrderStatus.CANCELLED);
+        return OrderResponse.from(orderRepository.save(order));
     }
 }

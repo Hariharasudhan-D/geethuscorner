@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Configuration
@@ -26,52 +27,65 @@ public class SecurityConfig {
 
     private final JwtService jwtService;   // the guard needs this to read wristbands
 
-    // The fingerprint machine 🔒 (used in signup and login)
+    // The fingerprint machine 🔒 (signup, login, change password)
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
-    // The RULE BOOK 📋
+    // The RULE BOOK 📋 (read top to bottom, the FIRST matching rule wins)
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable())                  // not needed: we use JWT, not cookies
+                .csrf(csrf -> csrf.disable())                  // we use JWT, not cookies
                 .cors(Customizer.withDefaults())               // use the CORS rules below
-                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))  // no memory, wristband every time
+                .sessionManagement(s -> s.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(e -> e.authenticationEntryPoint(
                         new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))   // not logged in → 401
 
                 .authorizeHttpRequests(auth -> auth
                         // 🟢 Open to everyone
                         .requestMatchers("/api/health", "/api/auth/signup", "/api/auth/login", "/error").permitAll()
+                        .requestMatchers(HttpMethod.GET,
+                                "/api/booking-info",       // closed and full dates (checkout)
+                                "/api/reviews/latest",     // reviews on the home page
+                                "/api/reviews/summary"     // star ratings on cake cards
+                        ).permitAll()
 
-                        // 🔴 Admin only: the full cake list (incl. hidden data later)
+                        // 🔴 Admin only
                         .requestMatchers(HttpMethod.GET, "/api/cakes/all").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                        // 🟢 Everyone can SEE the menu and one cake
+                        // 🟢 Everyone can see the menu and one cake
                         .requestMatchers(HttpMethod.GET, "/api/cakes", "/api/cakes/*").permitAll()
 
                         // 🔴 Admin only: add, edit, delete cakes (POST, PUT, DELETE)
                         .requestMatchers("/api/cakes/**").hasRole("ADMIN")
 
-                        // 🟡 Everything else: must be logged in (orders, profile... later)
+                        // 🟡 Everything else: must be logged in
                         .anyRequest().authenticated()
                 )
 
-                // Put our guard BEFORE Spring's own login filter
+                // Our guard reads the wristband BEFORE Spring's own login filter
                 .addFilterBefore(new JwtFilter(jwtService), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
 
-    // CORS: which website may call our API (moved here from CorsConfig.java)
+    // CORS: which websites may call our API.
+    // Default = the live site AND your laptop. On Render you can override it with FRONTEND_URL
+    // (one link, or several links separated by commas, with no "/" at the end).
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
-            @Value("${FRONTEND_URL:https://geethuscorner.vercel.app,http://localhost:5173}") String frontendUrls) {
+            @Value("${FRONTEND_URL:https://geethuscorner.vercel.app,http://localhost:5173}")
+            String frontendUrls) {
+
+        List<String> allowedSites = Arrays.stream(frontendUrls.split(","))   // "a,b" → ["a", "b"]
+                .map(String::trim)                                           // remove spaces
+                .toList();
 
         CorsConfiguration config = new CorsConfiguration();
-        config.setAllowedOrigins(List.of(frontendUrls.split(",")));          // only OUR websites (live + laptop)
+        config.setAllowedOrigins(allowedSites);                                // only OUR websites
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         config.setAllowedHeaders(List.of("Authorization", "Content-Type"));   // allow the wristband header
 

@@ -1,14 +1,28 @@
 import { useEffect, useState } from "react";
-import { getCakes } from "./api";
+import { getCakes, getRatingSummaries } from "./api";
 import Hero from "./Hero";
 import CakeCard from "./CakeCard";
+import Reviews from "./Reviews";
 
 // Home page: welcome banner + cake menu
-function Home({ onAddToCart }) {
+function Home({ onAddToCart, user }) {
   const [cakes, setCakes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [category, setCategory] = useState("All");
+  const [ratings, setRatings] = useState({});   // { 3: { cakeId: 3, average: 4.5, count: 2 } }
+
+  useEffect(() => {
+    getRatingSummaries()
+      .then((list) => {
+        const map = {};
+        for (const r of list) {
+          map[r.cakeId] = r;   // look-up by cake id
+        }
+        setRatings(map);
+      })
+      .catch(() => {});
+  }, []);
 
   // Load cakes once when the page opens
   useEffect(() => {
@@ -60,10 +74,12 @@ function Home({ onAddToCart }) {
 
         <div className="cake-grid">
           {shownCakes.map((cake) => (
-            <CakeCard key={cake.id} cake={cake} onAddToCart={onAddToCart} />
+            <CakeCard key={cake.id} cake={cake} onAddToCart={onAddToCart} rating={ratings[cake.id]} />
           ))}
         </div>
       </section>
+
+      <Reviews user={user} />
     </>
   );
 }

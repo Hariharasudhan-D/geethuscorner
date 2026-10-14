@@ -1,5 +1,5 @@
 // One cake card. It receives ONE cake (as a prop) and shows it.
-function CakeCard({ cake, onAddToCart }) {
+function CakeCard({ cake, onAddToCart, rating }) {
   return (
      <div className={cake.available ? "cake-card" : "cake-card sold"}>
       {/* Top: photo, or a cake emoji if there's no photo */}
@@ -17,6 +17,7 @@ function CakeCard({ cake, onAddToCart }) {
       {/* Bottom: details */}
       <div className="cake-info">
         <span className="cake-category">{cake.category}</span>
+        {rating && <span className="cake-rating">★ {rating.average} ({rating.count})</span>}
         <h3>{cake.name}</h3>
         <p>{cake.description}</p>
 

@@ -28,4 +28,10 @@ public class OrderController {
     public List<OrderResponse> getMyOrders(Authentication authentication) {
         return orderService.getMyOrders(authentication.getName());
     }
+
+    // PUT /api/orders/12/cancel → cancel my own pending order
+    @PutMapping("/{id}/cancel")
+    public OrderResponse cancelMyOrder(Authentication authentication, @PathVariable Long id) {
+        return orderService.cancelMyOrder(authentication.getName(), id);
+    }
 }

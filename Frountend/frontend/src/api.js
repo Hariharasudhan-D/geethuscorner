@@ -75,3 +75,115 @@ export function placeOrder(order) {
 export function getMyOrders() {
   return request("/api/orders/my");
 }
+
+export function cancelOrder(id) {
+  return request(`/api/orders/${id}/cancel`, { method: "PUT" });
+}
+
+// ---------- Admin: orders ----------
+export function getAllOrders() {
+  return request("/api/admin/orders");
+}
+
+export function updateOrderStatus(id, status) {
+  return request(`/api/admin/orders/${id}/status`, {
+    method: "PUT",
+    body: JSON.stringify({ status }),
+  });
+}
+
+// ---------- Admin: cakes ----------
+export function getAllCakesAdmin() {
+  return request("/api/cakes/all");
+}
+
+export function createCake(cake) {
+  return request("/api/cakes", { method: "POST", body: JSON.stringify(cake) });
+}
+
+export function updateCake(id, cake) {
+  return request(`/api/cakes/${id}`, { method: "PUT", body: JSON.stringify(cake) });
+}
+
+export function deleteCake(id) {
+  return request(`/api/cakes/${id}`, { method: "DELETE" });
+}
+
+// Upload a cake photo. Returns the photo's public link.
+export async function uploadImage(file) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_URL}/api/admin/images`, {
+    method: "POST",
+    headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    // NO Content-Type here: the browser sets it for FormData by itself
+    body: formData,
+  });
+
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.message || "Photo upload failed");
+  }
+  return data.url;
+}
+
+// ---------- Admin: customers ----------
+export function getAllUsers() {
+  return request("/api/admin/users");
+}
+
+// ---------- Booking ----------
+export function getBookingInfo() {
+  return request("/api/booking-info");
+}
+
+export function getClosedDates() {
+  return request("/api/admin/closed-dates");
+}
+
+export function addClosedDate(data) {
+  return request("/api/admin/closed-dates", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function deleteClosedDate(id) {
+  return request(`/api/admin/closed-dates/${id}`, { method: "DELETE" });
+}
+
+// ---------- Custom cakes ----------
+export function createCustomRequest(data) {
+  return request("/api/custom-requests", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function getMyCustomRequests() {
+  return request("/api/custom-requests/my");
+}
+
+export function getAllCustomRequests() {
+  return request("/api/admin/custom-requests");
+}
+
+export function updateCustomRequest(id, data) {
+  return request(`/api/admin/custom-requests/${id}`, { method: "PUT", body: JSON.stringify(data) });
+}
+
+// ---------- Reviews ----------
+export function addReview(data) {
+  return request("/api/reviews", { method: "POST", body: JSON.stringify(data) });
+}
+
+export function getMyReviewedCakeIds() {
+  return request("/api/reviews/mine");
+}
+
+export function getLatestReviews() {
+  return request("/api/reviews/latest");
+}
+
+export function getRatingSummaries() {
+  return request("/api/reviews/summary");
+}
+
+export function deleteReview(id) {
+  return request(`/api/admin/reviews/${id}`, { method: "DELETE" });
+}

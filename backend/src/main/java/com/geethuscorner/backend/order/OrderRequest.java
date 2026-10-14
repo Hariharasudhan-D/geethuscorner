@@ -6,12 +6,12 @@ import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.List;
 
-// The order form. Note: there is NO price and NO total here, on purpose.
+// The order form. NO price and NO total here, on purpose.
 public record OrderRequest(
 
         @NotEmpty(message = "Your cart is empty")
         @Size(max = 20, message = "Too many items in one order")
-        @Valid                                    // also check each item's rules
+        @Valid
         List<Item> items,
 
         @NotNull(message = "Choose delivery or pickup")
@@ -23,6 +23,9 @@ public record OrderRequest(
         @NotNull(message = "Choose a date")
         @Future(message = "Please choose a date from tomorrow onwards")
         LocalDate deliveryDate,
+
+        @NotNull(message = "Choose a time slot")
+        TimeSlot timeSlot,
 
         @NotNull(message = "Choose a payment method")
         PaymentMethod paymentMethod,

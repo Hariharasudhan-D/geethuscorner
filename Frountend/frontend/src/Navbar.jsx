@@ -25,6 +25,7 @@ function Navbar({ user, onLogout, cartCount }) {
           <Link to="/" onClick={goTop}>Home</Link>
           <a href="/#menu">Menu</a>
           <a href="#contact">Contact</a>
+          <Link to="/custom-cake">Custom cake</Link>
           <Link to="/cart">🛒 Cart ({cartCount})</Link>
 
           {user ? (
