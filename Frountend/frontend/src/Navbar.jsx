@@ -35,6 +35,8 @@ function Navbar({ user, onLogout, cartCount }) {
           <a href="/#menu">Menu</a>
           <a href="#contact">Contact</a>
           <Link to="/custom-cake">Custom cake</Link>
+          <a href="https://www.instagram.com/geethus_corner/" target="_blank" rel="noreferrer"
+             title="See our cake photos on Instagram">📸 @geethus_corner</a>
           <Link to="/cart">🛒 Cart ({cartCount})</Link>
 
           {user ? (
