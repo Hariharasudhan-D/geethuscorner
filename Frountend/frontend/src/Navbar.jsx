@@ -1,8 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 
-function Navbar({ user, onLogout }) {
-  const [menuOpen, setMenuOpen] = useState(false);   // is the dropdown open?
+// Smoothly scroll to the top of the page
+function goTop() {
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function Navbar({ user, onLogout, cartCount }) {
+  const [menuOpen, setMenuOpen] = useState(false);
   const navigate = useNavigate();
 
   function handleLogout() {
@@ -14,12 +19,13 @@ function Navbar({ user, onLogout }) {
   return (
     <nav className="navbar">
       <div className="navbar-inner">
-        <Link to="/" className="logo">Geethu's Corner 🍰</Link>
+        <Link to="/" className="logo" onClick={goTop}>Geethu's Corner 🍰</Link>
 
         <div className="nav-links">
-          <Link to="/">Home</Link>
+          <Link to="/" onClick={goTop}>Home</Link>
           <a href="/#menu">Menu</a>
           <a href="#contact">Contact</a>
+          <Link to="/cart">🛒 Cart ({cartCount})</Link>
 
           {user ? (
             <div className="user-menu">
@@ -32,6 +38,7 @@ function Navbar({ user, onLogout }) {
                   {user.role === "ADMIN" && (
                     <Link to="/admin" onClick={() => setMenuOpen(false)}>Admin dashboard</Link>
                   )}
+                  <Link to="/my-orders" onClick={() => setMenuOpen(false)}>My orders</Link>
                   <Link to="/change-password" onClick={() => setMenuOpen(false)}>Change password</Link>
                   <button onClick={handleLogout}>Logout</button>
                 </div>

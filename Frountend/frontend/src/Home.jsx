@@ -4,7 +4,7 @@ import Hero from "./Hero";
 import CakeCard from "./CakeCard";
 
 // Home page: welcome banner + cake menu
-function Home() {
+function Home({ onAddToCart }) {
   const [cakes, setCakes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -60,7 +60,7 @@ function Home() {
 
         <div className="cake-grid">
           {shownCakes.map((cake) => (
-            <CakeCard key={cake.id} cake={cake} />
+            <CakeCard key={cake.id} cake={cake} onAddToCart={onAddToCart} />
           ))}
         </div>
       </section>

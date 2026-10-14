@@ -64,3 +64,14 @@ export function changePassword(oldPassword, newPassword) {
 export function getMe() {
   return request("/api/auth/me");
 }
+// ---------- Orders ----------
+export function placeOrder(order) {
+  return request("/api/orders", {
+    method: "POST",
+    body: JSON.stringify(order),
+  });
+}
+
+export function getMyOrders() {
+  return request("/api/orders/my");
+}

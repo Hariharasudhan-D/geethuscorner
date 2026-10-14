@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useLocation, useNavigate } from "react-router";
 import { login } from "./api";
 
 function Login({ onLogin }) {
@@ -9,6 +9,7 @@ function Login({ onLogin }) {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();   // lets us move to another page in code
+  const location = useLocation();   // where did the customer come from?
 
   async function handleSubmit(event) {
     event.preventDefault();   // stop the browser from reloading the page
@@ -18,7 +19,7 @@ function Login({ onLogin }) {
     try {
       const data = await login(email, password);   // ask the backend
       onLogin(data);                                // save wristband + user (App.jsx)
-      navigate("/");                                // go to the Home page
+      navigate(location.state?.from || "/");   // back to checkout, or Home
     } catch (err) {
       setError(err.message);                        // e.g. "Wrong email or password"
     } finally {
