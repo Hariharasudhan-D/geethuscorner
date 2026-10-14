@@ -9,5 +9,5 @@ app_port: 7860
 
 # Geethu's Corner cake assistant
 
-FastAPI + LangChain agent (Claude) with RAG over the shop's notes
+FastAPI + LangChain agent (Gemini) with RAG over the shop's notes
 and a live menu tool that reads the Spring Boot API.

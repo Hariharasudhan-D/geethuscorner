@@ -12,18 +12,17 @@ from pydantic import BaseModel, Field
 # =========================
 load_dotenv()   # reads ai/.env on your laptop (online, the keys come from the Space settings)
 
-# ANTHROPIC_API_KEY → Claude (writes the answers)        - read automatically by LangChain
-# GOOGLE_API_KEY    → Google embeddings (RAG search)      - read automatically by LangChain
+# GOOGLE_API_KEY → Gemini (writes the answers) + Google embeddings (RAG search) - read automatically by LangChain
 BACKEND_URL = os.getenv("BACKEND_URL", "https://geethuscorner.onrender.com")   # our Spring Boot backend
 CHAT_SECRET = os.getenv("CHAT_SECRET", "")                                      # only Spring Boot knows it
 
 # =========================
-# LLM Model (Claude)
+# LLM Model (Gemini)
 # =========================
 from langchain.chat_models import init_chat_model
 
 llmmodel = init_chat_model(
-    "anthropic:claude-haiku-5-5",   # Claude Haiku: fast and cheap
+    "google_genai:gemini-2.5-flash",   # Gemini Flash: fast, has a free tier
     temperature=0.3,                # low = calm, factual answers
     max_tokens=500,                 # short answers, low cost
 )
@@ -105,7 +104,7 @@ def cake_menu() -> str:
     except requests.RequestException:
         return "The menu could not be loaded right now. Ask the customer to check the Menu on the website."
 
-    # 3. Turn the list into simple lines of text for Claude
+    # 3. Turn the list into simple lines of text for Gemini
     lines = []
     for cake in cakes:
         status = "available" if cake["available"] else "SOLD OUT today"
@@ -163,7 +162,7 @@ class ChatRequest(BaseModel):
 
 
 def get_text(message) -> str:
-    """Claude may answer as plain text or as a list of parts. Always return plain text."""
+    """Gemini may answer as plain text or as a list of parts. Always return plain text."""
     content = message.content
     if isinstance(content, str):
         return content
