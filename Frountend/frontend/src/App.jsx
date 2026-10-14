@@ -11,6 +11,7 @@ import Cart from "./Cart";                       // 🆕
 import Checkout from "./Checkout";
 import MyOrders from "./MyOrders";
 import CustomCake from "./CustomCake";
+import ChatBubble from "./ChatBubble";
 import { getMe } from "./api";
 import "./App.css";
 
@@ -160,6 +161,7 @@ function App() {
       </main>
 
       <Footer />
+      <ChatBubble user={user} />
     </BrowserRouter>
   );
 }

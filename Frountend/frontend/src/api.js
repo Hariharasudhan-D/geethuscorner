@@ -187,3 +187,8 @@ export function getRatingSummaries() {
 export function deleteReview(id) {
   return request(`/api/admin/reviews/${id}`, { method: "DELETE" });
 }
+
+// ---------- Cake assistant ----------
+export function sendChatMessage(message) {
+  return request("/api/chat", { method: "POST", body: JSON.stringify({ message }) });
+}
