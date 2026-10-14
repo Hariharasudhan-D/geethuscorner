@@ -3,8 +3,9 @@ title: Geethus Corner AI
 emoji: 🎂
 colorFrom: pink
 colorTo: yellow
-sdk: docker
-app_port: 7860
+sdk: gradio
+app_file: app.py
+pinned: false
 ---
 
 # Geethu's Corner cake assistant

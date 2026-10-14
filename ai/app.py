@@ -193,3 +193,19 @@ def chat(request: ChatRequest, x_chat_secret: str = Header(default="")):
     return {
         "response": get_text(result["messages"][-1])
     }
+
+
+# =========================
+# Run on Hugging Face (Gradio Space)
+# =========================
+# The free Gradio Space starts this file with "python app.py".
+# We add a tiny Gradio page at /ui (the Space needs one) and keep our own / and /chat.
+if __name__ == "__main__":
+    import gradio as gr
+    import uvicorn
+
+    with gr.Blocks() as demo:
+        gr.Markdown("Geethu's Corner cake assistant API is running 🎂")
+
+    app = gr.mount_gradio_app(app, demo, path="/ui")
+    uvicorn.run(app, host="0.0.0.0", port=7860)
