@@ -30,10 +30,18 @@ llmmodel = init_chat_model(
 # =========================
 # Load Documents
 # =========================
-from langchain_community.document_loaders import TextLoader
+from langchain_core.documents import Document
 
-aboutus_txt = TextLoader("aboutus.txt", encoding="utf-8").load()
-shopinfo_txt = TextLoader("shopinfo.txt", encoding="utf-8").load()
+HERE = os.path.dirname(os.path.abspath(__file__))   # the ai folder (works on any host)
+
+
+def load_text(name):
+    with open(os.path.join(HERE, name), encoding="utf-8") as file:
+        return [Document(page_content=file.read(), metadata={"source": name})]
+
+
+aboutus_txt = load_text("aboutus.txt")
+shopinfo_txt = load_text("shopinfo.txt")
 
 # =========================
 # Split Documents (one chunk per "---" section)
@@ -195,17 +203,8 @@ def chat(request: ChatRequest, x_chat_secret: str = Header(default="")):
     }
 
 
-# =========================
-# Run on Hugging Face (Gradio Space)
-# =========================
-# The free Gradio Space starts this file with "python app.py".
-# We add a tiny Gradio page at /ui (the Space needs one) and keep our own / and /chat.
+
+# Run on your laptop with: python app.py  (or uvicorn app:app --reload --port 8000)
 if __name__ == "__main__":
-    import gradio as gr
     import uvicorn
-
-    with gr.Blocks() as demo:
-        gr.Markdown("Geethu's Corner cake assistant API is running 🎂")
-
-    app = gr.mount_gradio_app(app, demo, path="/ui")
-    uvicorn.run(app, host="0.0.0.0", port=7860)
+    uvicorn.run(app, host="0.0.0.0", port=8000)
