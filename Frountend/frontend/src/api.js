@@ -15,6 +15,14 @@ async function request(path, options = {}) {
 
   // Read the JSON answer (some answers have no body, so we allow "null")
   const data = await response.json().catch(() => null);
+  // 🆕 Wristband rejected (expired or fake) → log out and go to Login.
+  // Not for login/signup themselves, where 401 just means "wrong password".
+  const isAuthPage = path === "/api/auth/login" || path === "/api/auth/signup";
+  if (response.status === 401 && token && !isAuthPage) {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    window.location.href = "/login";
+  }
 
   if (!response.ok) {
     // Use the backend's own message, e.g. "Wrong email or password"
@@ -51,4 +59,8 @@ export function changePassword(oldPassword, newPassword) {
     method: "PUT",
     body: JSON.stringify({ oldPassword, newPassword }),
   });
+}
+// 🆕 Who am I? (needs the wristband)
+export function getMe() {
+  return request("/api/auth/me");
 }
