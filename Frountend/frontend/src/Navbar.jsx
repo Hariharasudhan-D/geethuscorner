@@ -8,10 +8,12 @@ function goTop() {
 
 function Navbar({ user, onLogout, cartCount }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [navOpen, setNavOpen] = useState(false);   // phone menu (☰)
   const navigate = useNavigate();
 
   function handleLogout() {
     setMenuOpen(false);
+    setNavOpen(false);
     onLogout();
     navigate("/");
   }
@@ -21,7 +23,14 @@ function Navbar({ user, onLogout, cartCount }) {
       <div className="navbar-inner">
         <Link to="/" className="logo" onClick={goTop}>Geethu's Corner 🍰</Link>
 
-        <div className="nav-links">
+        <button className="nav-toggle" onClick={() => setNavOpen(!navOpen)}
+                aria-label={navOpen ? "Close menu" : "Open menu"} aria-expanded={navOpen}>
+          {navOpen ? "✕" : "☰"}
+        </button>
+
+        {/* On phones, close the menu after a link is tapped */}
+        <div className={`nav-links ${navOpen ? "open" : ""}`}
+             onClick={(e) => { if (e.target.closest("a")) setNavOpen(false); }}>
           <Link to="/" onClick={goTop}>Home</Link>
           <a href="/#menu">Menu</a>
           <a href="#contact">Contact</a>

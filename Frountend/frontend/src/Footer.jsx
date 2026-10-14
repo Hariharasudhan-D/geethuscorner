@@ -13,8 +13,9 @@ function Footer() {
 
         <div>
           <h4>Contact</h4>
-          <p>📞 +91 00000 00000</p>
-          <p>📍 Your shop address here</p>
+          <p>📞 <a href="tel:+916369512910">+91 63695 12910</a></p>
+          <p>💬 <a href="https://wa.me/916369512910" target="_blank" rel="noreferrer">WhatsApp us</a></p>
+          <p>📍 Chennimalai, Erode</p>
         </div>
 
         <div>

@@ -136,7 +136,7 @@ tools = [
 from langchain.agents import create_agent
 
 SYSTEM_PROMPT = """
-You are the friendly cake assistant of Geethu's Corner, a home bakery in Erode, Tamil Nadu.
+You are the friendly cake assistant of Geethu's Corner, a home bakery in Chennimalai, Erode, Tamil Nadu.
 
 Rules:
 - For ANY question about cakes, flavours, prices or availability, ALWAYS use the Cake_Menu tool first. Never guess a price.
