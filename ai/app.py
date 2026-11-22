@@ -1,96 +1,45 @@
 import os
 import secrets
 import time
+from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel, Field
 
-# =========================
-# Environment Variables
-# =========================
-load_dotenv()   # reads ai/.env on your laptop (online, the keys come from the Space settings)
-
-# GOOGLE_API_KEY → Gemini (writes the answers) + Google embeddings (RAG search) - read automatically by LangChain
-BACKEND_URL = os.getenv("BACKEND_URL", "https://geethuscorner-k5y6.onrender.com")   # our Spring Boot backend
-CHAT_SECRET = os.getenv("CHAT_SECRET", "")                                      # only Spring Boot knows it
-
-# =========================
-# LLM Model (Gemini)
-# =========================
-from langchain.chat_models import init_chat_model
-
-llmmodel = init_chat_model(
-    "google_genai:gemini-2.5-flash",   # Gemini Flash: fast, has a free tier
-    temperature=0.3,                # low = calm, factual answers
-    max_tokens=500,                 # short answers, low cost
-)
-
-# =========================
-# Load Documents
-# =========================
-from langchain_core.documents import Document
-
-HERE = os.path.dirname(os.path.abspath(__file__))   # the ai folder (works on any host)
-
-
-def load_text(name):
-    with open(os.path.join(HERE, name), encoding="utf-8") as file:
-        return [Document(page_content=file.read(), metadata={"source": name})]
-
-
-aboutus_txt = load_text("aboutus.txt")
-shopinfo_txt = load_text("shopinfo.txt")
-
-# =========================
-# Split Documents (one chunk per "---" section)
-# =========================
-from langchain_text_splitters import RecursiveCharacterTextSplitter
-
-text_splitter = RecursiveCharacterTextSplitter(
-    separators=["\n---\n", "\n\n", "\n"],   # cut at "---" first, so a section stays together
-    chunk_size=1000,
-    chunk_overlap=0,
-)
-
-aboutus_doc = text_splitter.split_documents(aboutus_txt)
-shopinfo_doc = text_splitter.split_documents(shopinfo_txt)
-
-# =========================
-# Vector DB (in memory)
-# =========================
-from langchain_google_genai import GoogleGenerativeAIEmbeddings
-from langchain_core.vectorstores.in_memory import InMemoryVectorStore
-
-embeddings = GoogleGenerativeAIEmbeddings(
-    model="models/gemini-embedding-001"
-)
-
-aboutus_db = InMemoryVectorStore.from_documents(aboutus_doc, embeddings)
-shopinfo_db = InMemoryVectorStore.from_documents(shopinfo_doc, embeddings)
-
-aboutus_retriver = aboutus_db.as_retriever(search_kwargs={"k": 2})     # the 2 best sections
-shopinfo_retriver = shopinfo_db.as_retriever(search_kwargs={"k": 3})   # the 3 best sections
-
-# =========================
-# Tools
-# =========================
+from langchain.agents import create_agent
 from langchain_core.tools import tool
-from langchain_core.tools.retriever import create_retriever_tool
+from langchain_groq import ChatGroq
 
-aboutus_retrival_tool = create_retriever_tool(
-    aboutus_retriver,
-    "About_Us",
-    "Facts about Geethu's Corner: who runs it, our story, what makes our cakes special, where to find us."
+HERE = Path(__file__).resolve().parent
+load_dotenv(HERE / ".env")
+
+BACKEND_URL = os.getenv("BACKEND_URL", "https://geethuscorner-k5y6.onrender.com")
+CHAT_SECRET = os.getenv("CHAT_SECRET", "")
+
+llmmodel = ChatGroq(
+    model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
+    temperature=0.3,
+    max_tokens=500,
+    model_kwargs={"parallel_tool_calls": False},
 )
 
-shopinfo_retrival_tool = create_retriever_tool(
-    shopinfo_retriver,
-    "Shop_Rules",
-    "How ordering works: delivery, pickup, dates, time slots, payment, order tracking, "
-    "cancelling, custom cakes, sizes, eggless and allergies, reviews, contact details."
-)
+ABOUT_US = (HERE / "aboutus.txt").read_text(encoding="utf-8")
+SHOP_RULES = (HERE / "shopinfo.txt").read_text(encoding="utf-8")
+
+
+@tool("About_Us")
+def about_us() -> str:
+    """Facts about Geethu's Corner, its story, cakes and location."""
+    return ABOUT_US
+
+
+@tool("Shop_Rules")
+def shop_rules() -> str:
+    """Ordering, delivery, pickup, payments, tracking, custom cakes, allergies and contact details."""
+    return SHOP_RULES
+
 
 menu_cache = {"text": "", "time": 0.0}   # remember the menu for 5 minutes
 
@@ -112,7 +61,7 @@ def cake_menu() -> str:
     except requests.RequestException:
         return "The menu could not be loaded right now. Ask the customer to check the Menu on the website."
 
-    # 3. Turn the list into simple lines of text for Gemini
+    # 3. Format the menu for the chatbot
     lines = []
     for cake in cakes:
         status = "available" if cake["available"] else "SOLD OUT today"
@@ -126,14 +75,9 @@ def cake_menu() -> str:
 
 tools = [
     cake_menu,
-    shopinfo_retrival_tool,
-    aboutus_retrival_tool,
+    shop_rules,
+    about_us,
 ]
-
-# =========================
-# Agent
-# =========================
-from langchain.agents import create_agent
 
 SYSTEM_PROMPT = """
 You are the friendly cake assistant of Geethu's Corner, a home bakery in Chennimalai, Erode, Tamil Nadu.
@@ -170,7 +114,7 @@ class ChatRequest(BaseModel):
 
 
 def get_text(message) -> str:
-    """Gemini may answer as plain text or as a list of parts. Always return plain text."""
+    """Extract the visible text from the model response."""
     content = message.content
     if isinstance(content, str):
         return content

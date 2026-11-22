@@ -2,8 +2,6 @@ fastapi
 uvicorn
 python-dotenv
 requests
-numpy
 langchain>=1.0
 langchain-core>=1.0
-langchain-text-splitters
-langchain-google-genai
+langchain-groq
