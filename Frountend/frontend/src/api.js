@@ -1,5 +1,6 @@
-// Backend address. Locally port 8080. On the live site we set VITE_API_URL.
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8080";
+const API_URL = import.meta.env.VITE_API_URL || (
+  import.meta.env.PROD ? "https://geethuscorner-mnoz.onrender.com" : "http://localhost:8080"
+);
 
 // ONE helper for ALL backend calls.
 // It adds the wristband (if we have one) and turns backend errors into JS errors.
