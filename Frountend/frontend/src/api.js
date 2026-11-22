@@ -1,5 +1,5 @@
 const API_URL = import.meta.env.VITE_API_URL || (
-  import.meta.env.PROD ? "https://geethuscorner-mnoz.onrender.com" : "http://localhost:8080"
+  import.meta.env.PROD ? "https://geethuscorner-k5y6.onrender.com" : "http://localhost:8080"
 );
 
 // ONE helper for ALL backend calls.

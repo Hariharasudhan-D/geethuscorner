@@ -13,7 +13,7 @@ from pydantic import BaseModel, Field
 load_dotenv()   # reads ai/.env on your laptop (online, the keys come from the Space settings)
 
 # GOOGLE_API_KEY → Gemini (writes the answers) + Google embeddings (RAG search) - read automatically by LangChain
-BACKEND_URL = os.getenv("BACKEND_URL", "https://geethuscorner-mnoz.onrender.com")   # our Spring Boot backend
+BACKEND_URL = os.getenv("BACKEND_URL", "https://geethuscorner-k5y6.onrender.com")   # our Spring Boot backend
 CHAT_SECRET = os.getenv("CHAT_SECRET", "")                                      # only Spring Boot knows it
 
 # =========================
