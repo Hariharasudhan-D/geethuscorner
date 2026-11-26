@@ -70,6 +70,22 @@
   box-shadow: 0 14px 32px rgba(74, 44, 31, 0.15);
 }
 
+.cake-skeleton {
+  pointer-events: none;
+}
+
+.cake-skeleton .cake-info span {
+  display: block;
+  height: 12px;
+  margin: 10px 0;
+  border-radius: 8px;
+  background: #f7e9e5;
+}
+
+.cake-skeleton .cake-info span:nth-child(1) { width: 35%; }
+.cake-skeleton .cake-info span:nth-child(2) { width: 65%; }
+.cake-skeleton .cake-info span:nth-child(3) { width: 90%; }
+
 .cake-image {
   position: relative;
   height: 200px;

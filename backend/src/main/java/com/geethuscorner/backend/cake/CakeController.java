@@ -3,10 +3,12 @@ package com.geethuscorner.backend.cake;
 import jakarta.validation.Valid;                       // 🆕 new import
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.CacheControl;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.time.Duration;
 
 @RestController                  // answers requests with JSON
 @RequestMapping("/api/cakes")    // all URLs start with /api/cakes
@@ -16,9 +18,11 @@ public class CakeController {
     private final CakeService cakeService;
 
     // GET /api/cakes → in-stock cakes
-      @GetMapping
-    public List<Cake> getMenuCakes() {
-        return cakeService.getMenuCakes();
+    @GetMapping
+    public ResponseEntity<List<Cake>> getMenuCakes() {
+        return ResponseEntity.ok()
+                .cacheControl(CacheControl.maxAge(Duration.ofSeconds(30)).cachePrivate())
+                .body(cakeService.getMenuCakes());
     }
 
     // GET /api/cakes/all → all cakes

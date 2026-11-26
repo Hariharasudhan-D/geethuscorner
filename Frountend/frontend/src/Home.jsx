@@ -66,15 +66,21 @@ function Home({ onAddToCart, user }) {
           ))}
         </div>
 
-        {loading && <p className="status-message">Loading cakes... 🎂</p>}
+        {loading && <p className="status-message" role="status">Loading cakes…</p>}
         {error && <p className="status-message error">{error}</p>}
         {!loading && !error && shownCakes.length === 0 && (
           <p className="status-message">No cakes here yet.</p>
         )}
 
-        <div className="cake-grid">
-          {shownCakes.map((cake) => (
-            <CakeCard key={cake.id} cake={cake} onAddToCart={onAddToCart} rating={ratings[cake.id]} />
+        <div className="cake-grid" aria-busy={loading}>
+          {loading && [1, 2, 3, 4].map((slot) => (
+            <div className="cake-card cake-skeleton" key={slot} aria-hidden="true">
+              <div className="cake-image" />
+              <div className="cake-info"><span /><span /><span /></div>
+            </div>
+          ))}
+          {shownCakes.map((cake, index) => (
+            <CakeCard key={cake.id} cake={cake} onAddToCart={onAddToCart} rating={ratings[cake.id]} featured={index === 0} />
           ))}
         </div>
       </section>

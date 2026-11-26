@@ -4,10 +4,13 @@ const API_URL = import.meta.env.VITE_API_URL || (
 
 // ONE helper for ALL backend calls.
 // It adds the wristband (if we have one) and turns backend errors into JS errors.
-async function request(path, options = {}) {
-  const headers = { "Content-Type": "application/json" };
+async function request(path, { anonymous = false, ...options } = {}) {
+  const headers = {};
+  if (options.body !== undefined) {
+    headers["Content-Type"] = "application/json";
+  }
 
-  const token = localStorage.getItem("token");
+  const token = anonymous ? null : localStorage.getItem("token");
   if (token) {
     headers.Authorization = `Bearer ${token}`;   // show the wristband 🎟️
   }
@@ -36,8 +39,13 @@ async function request(path, options = {}) {
 }
 
 // ---------- Cakes ----------
+let pendingCakes;
+
 export function getCakes() {
-  return request("/api/cakes");
+  pendingCakes ??= request("/api/cakes", { anonymous: true }).finally(() => {
+    pendingCakes = undefined;
+  });
+  return pendingCakes;
 }
 
 // ---------- Login / Signup ----------
@@ -178,11 +186,11 @@ export function getMyReviewedCakeIds() {
 }
 
 export function getLatestReviews() {
-  return request("/api/reviews/latest");
+  return request("/api/reviews/latest", { anonymous: true });
 }
 
 export function getRatingSummaries() {
-  return request("/api/reviews/summary");
+  return request("/api/reviews/summary", { anonymous: true });
 }
 
 export function deleteReview(id) {
